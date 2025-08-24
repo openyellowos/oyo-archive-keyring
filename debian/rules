@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_install:
+	# 公開鍵を dearmor して keyring に配置
+	mkdir -p debian/oyo-archive-keyring/usr/share/keyrings
+	gpg --dearmor -o debian/oyo-archive-keyring/usr/share/keyrings/oyo-archive.gpg \
+	    oyo-archive-key.asc
+	# metainfo を入れる場合（任意）
+	if [ -f debian/oyo-archive-keyring.metainfo.xml ]; then \
+	  mkdir -p debian/oyo-archive-keyring/usr/share/metainfo; \
+	  install -m 0644 debian/oyo-archive-keyring.metainfo.xml \
+	    debian/oyo-archive-keyring/usr/share/metainfo/; \
+	fi
+	dh_install
+

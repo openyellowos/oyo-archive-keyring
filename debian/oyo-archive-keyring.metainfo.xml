@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="generic">
+  <!-- RDNS形式 & ハイフン無し -->
+  <id>org.oyo.archivekeyring</id>
+
+  <name>oYo Archive Keyring</name>
+  <summary>oYo 公式 APT リポジトリの認証鍵</summary>
+
+  <description>
+    <p>
+      このパッケージは、oYo 公式 APT リポジトリの GPG 公開鍵を
+      システムに登録します。これにより、APT は配布パッケージの
+      整合性と正当性を検証できます。
+    </p>
+  </description>
+
+  <!-- パッケージとの関連付け -->
+  <provides>
+    <id>debian-pkg:oyo-archive-keyring</id>
+  </provides>
+
+  <project_license>GPL-3.0+</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+  <developer_name>oYo Project</developer_name>
+
+  <releases>
+    <release version="1.0-1" date="2025-08-24"/>
+  </releases>
+</component>
+

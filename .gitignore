@@ -1,0 +1,12 @@
+# build outputs
+*.deb
+*.changes
+*.buildinfo
+*.dsc
+*.tar.*
+debian/.debhelper/
+debian/oyo-archive-keyring/
+debian/files
+debian/*substvars
+debian/debhelper-build-stamp
+

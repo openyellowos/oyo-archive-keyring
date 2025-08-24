@@ -1,0 +1,15 @@
+Source: oyo-archive-keyring
+Section: admin
+Priority: optional
+Maintainer: TOSHIO <solution92001@gmail.com>
+Standards-Version: 4.7.0
+Build-Depends: debhelper-compat (= 13), gnupg
+
+Package: oyo-archive-keyring
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: APT repository keyring for open.Yellow.os
+ This package installs the APT keyring at /usr/share/keyrings/oyo-archive.gpg
+ for the open.Yellow.os repository.
+

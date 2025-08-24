@@ -1,0 +1,2 @@
+keyrings/oyo-archive.gpg usr/share/keyrings/
+debian/oyo-archive-keyring.metainfo.xml usr/share/metainfo/
