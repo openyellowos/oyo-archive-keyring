@@ -1,5 +1,5 @@
-oyo-archive-keyring (1.0-1) unstable; urgency=medium
+oyo-archive-keyring (1.0) unstable; urgency=medium
 
-  * Initial release.
+  * Initial native release
 
- -- toshio <toshio@oYo>  Sun, 10 Aug 2025 18:18:31 +0900
+ -- toshio <toshio@oYo>  Sun, 24 Aug 2025 22:49:49 +0900
