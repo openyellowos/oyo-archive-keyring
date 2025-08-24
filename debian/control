@@ -2,7 +2,7 @@ Source: oyo-archive-keyring
 Section: admin
 Priority: optional
 Maintainer: TOSHIO <solution92001@gmail.com>
-Standards-Version: 4.7.0
+Standards-Version: 4.6.2
 Build-Depends: debhelper-compat (= 13), gnupg
 
 Package: oyo-archive-keyring
