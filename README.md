@@ -13,26 +13,49 @@ APT がパッケージ署名を検証するために必須となるコンポー�
 
 ---
 
-## CI/CD の仕組み
+## クライアントPCからの取得方法
 
-このリポジトリは GitHub Actions により、自動で `.deb` をビルド・リリースします。  
-その後、[`apt-repo-infra`](https://github.com/openyellowos/apt-repo-infra) を **手動で Run workflow 実行** することで、APT リポジトリに反映されます。
+公式リポジトリからインストール可能です。
 
-### フロー
+```bash
+sudo apt update
+sudo apt install oyo-archive-keyring
+```
 
-1. 開発者が新しいタグを push  
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-2. GitHub Actions が `.deb` をビルド  
-3. GitHub Release に成果物を添付  
-4. 開発者が `apt-repo-infra` の `Run workflow` を実行  
-5. `deb.openyellowos.org` に公開  
+インストールすると `/usr/share/keyrings/oyo-archive.gpg` が配置され、  
+`/etc/apt/sources.list.d/openyellowos.list` 内のリポジトリ設定で署名検証に使用されます。
 
 ---
 
-## 図解（Mermaid）
+## 使い方
+
+通常はユーザーが直接操作することはありません。  
+APT が自動的に公開鍵を利用してパッケージ署名を検証します。  
+
+---
+
+## 依存関係
+
+- ランタイム依存関係は特にありません。  
+- Debian パッケージ標準の仕組みに基づき、`/usr/share/keyrings/` 配下に GPG 鍵を配置します。  
+
+---
+
+## 仕組みと設定方法（管理者向け）
+
+- 公開鍵 (`oyo-archive.gpg`) をシステムに導入し、APT の署名検証に利用します。  
+- リポジトリ定義ファイル例:  
+
+```text
+deb [signed-by=/usr/share/keyrings/oyo-archive.gpg] http://deb.openyellowos.org trixie main
+```
+
+---
+
+## CI/CD の仕組み（開発者向け）
+
+`oyo-archive-keyring` は GitHub Actions により自動で `.deb` をビルド・リリースします。  
+その後、[`apt-repo-infra`](https://github.com/openyellowos/apt-repo-infra) を **手動で Run workflow 実行** することで APT リポジトリに反映されます。  
 
 ```mermaid
 flowchart LR
@@ -44,26 +67,88 @@ flowchart LR
 
 ---
 
-## 鍵の更新手順
+### フロー概要
 
-新しい鍵を公開する場合は以下の手順を実行します。
+1. **ソースコード修正**
+   ```bash
+   git clone https://github.com/openyellowos/oyo-archive-keyring.git
+   cd oyo-archive-keyring
+   ```
 
-1. GPG 鍵をエクスポート  
+2. **鍵の更新**
    ```bash
    gpg --armor --export <KEYID> > oyo-archive.gpg
    ```
-2. `debian/changelog` を更新  
+
+3. **changelog 更新**
    ```bash
-   dch -i
-   ```
-3. コミット & タグを push  
-   ```bash
-   git commit -am "Update GPG key"
-   git tag v1.0.1
-   git push origin main --tags
+   debchange -i
    ```
 
-以降の処理は CI/CD により自動化され、`apt-repo-infra` を手動実行すれば公開されます。
+4. **コミット & push**
+   ```bash
+   git add .
+   git commit -m "Update GPG key"
+   git push origin main
+   ```
+
+5. **タグ付与**
+   ```bash
+   git tag v1.0.1
+   git push origin v1.0.1
+   ```
+
+6. **GitHub Actions による自動ビルド**
+   - タグ push を検知してワークフローが起動  
+   - `.deb` がビルドされ、GitHub Release に添付  
+
+7. **APT リポジトリ公開**
+   - `apt-repo-infra` の GitHub Actions を **手動で Run workflow**  
+   - 入力例：  
+     - Source repo: `openyellowos/oyo-archive-keyring`  
+     - Release tag: `v1.0.1`  
+     - Target environment: `production`  
+
+---
+
+## 開発環境に必要なパッケージ & ローカルでビルドする手順
+
+### 必要なツール
+```bash
+sudo apt update
+sudo apt install -y devscripts build-essential debhelper lintian
+```
+
+### deb-src を有効にする
+1. `/etc/apt/sources.list` を編集
+   ```bash
+   sudo nano /etc/apt/sources.list
+   ```
+2. `deb-src` 行を有効化して保存
+   ```text
+   deb-src http://deb.debian.org/debian trixie main contrib non-free-firmware
+   ```
+3. 更新
+   ```bash
+   sudo apt update
+   ```
+
+### ビルド依存の導入
+```bash
+sudo apt-get build-dep -y ./
+```
+
+### ローカルビルド
+```bash
+dpkg-buildpackage -us -uc -b
+```
+生成物は `../oyo-archive-keyring_*_all.deb` に出力されます。
+
+### テストインストール / アンインストール
+```bash
+sudo apt install ./../oyo-archive-keyring_*_all.deb
+sudo apt remove oyo-archive-keyring
+```
 
 ---
 
@@ -71,18 +156,6 @@ flowchart LR
 
 - Semantic Versioning (`vX.Y.Z`) を採用  
 - **staging / production** の環境を想定（現在は production のみ運用中）  
-
----
-
-## ローカルでのビルド（必要に応じて）
-
-CI/CD による自動ビルドが基本ですが、手元で確認する場合は以下を実行します。
-
-```bash
-sudo apt-get install devscripts debhelper
-debuild -us -uc
-ls ../*.deb
-```
 
 ---
 
