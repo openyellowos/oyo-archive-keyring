@@ -105,8 +105,6 @@ flowchart LR
 7. **APT リポジトリ公開**
    - `apt-repo-infra` の GitHub Actions を **手動で Run workflow**  
    - 入力例：  
-     - Source repo: `openyellowos/oyo-archive-keyring`  
-     - Release tag: `v1.0.1`  
      - Target environment: `production`  
 
 ---
